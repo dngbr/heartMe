@@ -24,8 +24,9 @@ Devise.setup do |config|
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class
   # with default "from" parameter.
-  # Make sure this email matches the verified sender identity in SendGrid
-  config.mailer_sender = 'noreply@heartme.app'
+  # Using your personal email that was verified in SendGrid
+  # Replace this with the exact email you verified in SendGrid
+  config.mailer_sender = 'luciangabrieldan@gmail.com'
 
   # Configure the class responsible to send e-mails.
   # config.mailer = 'Devise::Mailer'
