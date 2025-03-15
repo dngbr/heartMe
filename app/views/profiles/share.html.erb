@@ -24,7 +24,13 @@
       
       <!-- Bio section -->
       <div class="text-center mt-5 px-4 pb-4">
-        <h2 class="h4 mb-3"><%= @profile.user.email.split('@').first %></h2>
+        <h2 class="h4 mb-3">
+          <% if @profile.name.present? %>
+            <%= @profile.name %>
+          <% else %>
+            <%= @profile.user.email.split('@').first %>
+          <% end %>
+        </h2>
         <% if @profile.bio.present? %>
           <p class="text-muted"><%= @profile.bio %></p>
         <% else %>

@@ -42,6 +42,13 @@
           </div>
           
           <div class="mb-4">
+            <h4>Name</h4>
+            <div class="mb-3">
+              <%= form.text_field :name, class: "form-control", placeholder: "Your name" %>
+            </div>
+          </div>
+          
+          <div class="mb-4">
             <h4>Bio</h4>
             <div class="mb-3">
               <%= form.text_area :bio, class: "form-control", rows: 5, placeholder: "Tell us about yourself..." %>
