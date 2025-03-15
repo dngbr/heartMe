@@ -51,28 +51,19 @@ test:
 production:
   primary:
     <<: *default
-    database: heartMe_production
-    username: bitzu
-    password: 2399
-    host: localhost
+    url: <%= ENV['DATABASE_URL'] %>
   cache:
     <<: *default
+    url: <%= ENV['DATABASE_URL'] %>
     database: heartMe_production_cache
     migrations_paths: db/cache_migrate
-    username: bitzu
-    password: 2399
-    host: localhost
   queue:
     <<: *default
+    url: <%= ENV['DATABASE_URL'] %>
     database: heartMe_production_queue
     migrations_paths: db/queue_migrate
-    username: bitzu
-    password: 2399
-    host: localhost
   cable:
     <<: *default
+    url: <%= ENV['DATABASE_URL'] %>
     database: heartMe_production_cable
     migrations_paths: db/cable_migrate
-    username: bitzu
-    password: 2399
-    host: localhost
