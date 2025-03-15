@@ -1,0 +1,70 @@
+/* Custom styles for HeartMe application */
+
+/* General styles */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+}
+
+/* Navbar customization */
+.navbar-brand {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+/* Profile page styles */
+.profile-header {
+  position: relative;
+  margin-bottom: 60px;
+}
+
+.profile-picture-container {
+  position: relative;
+  z-index: 2;
+}
+
+/* Card hover effects */
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: #8B0000;
+  border-color: #8B0000;
+}
+
+.btn-primary:hover {
+  background-color: #6B0000;
+  border-color: #6B0000;
+}
+
+.btn-outline-primary {
+  color: #8B0000;
+  border-color: #8B0000;
+}
+
+.btn-outline-primary:hover {
+  background-color: #8B0000;
+  border-color: #8B0000;
+  color: white;
+}
+
+/* Form elements */
+.form-control:focus {
+  border-color: #8B0000;
+  box-shadow: 0 0 0 0.25rem rgba(139, 0, 0, 0.25);
+}
+
+/* Footer styles */
+footer {
+  margin-top: 3rem;
+  padding: 1.5rem 0;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e3e6f0;
+}

@@ -1,0 +1,99 @@
+<div class="row">
+  <div class="col-md-12 mb-4">
+    <% if @profile.background_picture.attached? %>
+      <div class="bg-image" style="height: 200px; background-image: url('<%= url_for(@profile.background_picture) %>'); background-size: cover; background-position: center; border-radius: 8px;"></div>
+    <% else %>
+      <div class="bg-image bg-primary" style="height: 200px; border-radius: 8px;"></div>
+    <% end %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-4 text-center">
+    <% if @profile.profile_picture.attached? %>
+      <%= image_tag @profile.profile_picture, class: "img-fluid rounded-circle", style: "width: 200px; height: 200px; object-fit: cover; margin-top: -100px; border: 5px solid white;" %>
+    <% else %>
+      <div class="rounded-circle bg-secondary d-inline-flex justify-content-center align-items-center" style="width: 200px; height: 200px; margin-top: -100px; border: 5px solid white;">
+        <span class="display-4 text-white"><%= @profile.user.email.first.upcase %></span>
+      </div>
+    <% end %>
+    <h2 class="mt-3"><%= @profile.user.email.split('@').first %></h2>
+    <% if current_user == @profile.user %>
+      <div class="mt-2">
+        <%= link_to "Edit Profile", edit_profile_path(@profile), class: "btn btn-outline-primary" %>
+      </div>
+      
+      <div class="mt-3">
+        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#shareModal">
+          <i class="bi bi-share"></i> Share Profile
+        </button>
+      </div>
+      
+      <!-- Share Modal -->
+      <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="shareModalLabel">Share Your Profile</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <!-- Tab navigation -->
+              <ul class="nav nav-tabs mb-3" id="shareTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="link-tab" data-bs-toggle="tab" data-bs-target="#link-tab-pane" type="button" role="tab" aria-controls="link-tab-pane" aria-selected="true">Share Link</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="qr-tab" data-bs-toggle="tab" data-bs-target="#qr-tab-pane" type="button" role="tab" aria-controls="qr-tab-pane" aria-selected="false">QR Code</button>
+                </li>
+              </ul>
+              
+              <!-- Tab content -->
+              <div class="tab-content" id="shareTabContent">
+                <!-- Link sharing tab -->
+                <div class="tab-pane fade show active" id="link-tab-pane" role="tabpanel" aria-labelledby="link-tab" tabindex="0">
+                  <p>Share this link with others to let them view your profile:</p>
+                  <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="shareUrl" value="<%= @profile.shareable_url %>" readonly>
+                    <button class="btn btn-outline-primary" type="button" onclick="copyShareUrl()">Copy</button>
+                  </div>
+                </div>
+                
+                <!-- QR code tab -->
+                <div class="tab-pane fade" id="qr-tab-pane" role="tabpanel" aria-labelledby="qr-tab" tabindex="0">
+                  <p>Scan this QR code to view the profile:</p>
+                  <div class="text-center mb-3">
+                    <div id="qrcode" style="display: inline-block; padding: 15px; background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                      <%= @profile.qr_code.html_safe %>
+                    </div>
+                  </div>
+                  <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary" type="button" onclick="downloadQRCode()">Download QR Code</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h3>Bio</h3>
+      </div>
+      <div class="card-body">
+        <% if @profile.bio.present? %>
+          <p><%= @profile.bio %></p>
+        <% else %>
+          <p class="text-muted">No bio available.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

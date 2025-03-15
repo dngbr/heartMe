@@ -1,0 +1,59 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h2>Edit Your Profile</h2>
+      </div>
+      <div class="card-body">
+        <%= form_with(model: @profile, local: true, html: { multipart: true }) do |form| %>
+          <% if @profile.errors.any? %>
+            <div class="alert alert-danger">
+              <h4><%= pluralize(@profile.errors.count, "error") %> prohibited this profile from being saved:</h4>
+              <ul>
+                <% @profile.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+          
+          <div class="mb-4">
+            <h4>Background Picture</h4>
+            <% if @profile.background_picture.attached? %>
+              <div class="mb-3">
+                <%= image_tag @profile.background_picture, class: "img-fluid", style: "max-height: 200px; border-radius: 8px;" %>
+              </div>
+            <% end %>
+            <div class="mb-3">
+              <%= form.file_field :background_picture, class: "form-control", accept: "image/*" %>
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <h4>Profile Picture</h4>
+            <% if @profile.profile_picture.attached? %>
+              <div class="mb-3">
+                <%= image_tag @profile.profile_picture, class: "img-fluid rounded-circle", style: "width: 150px; height: 150px; object-fit: cover;" %>
+              </div>
+            <% end %>
+            <div class="mb-3">
+              <%= form.file_field :profile_picture, class: "form-control", accept: "image/*" %>
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <h4>Bio</h4>
+            <div class="mb-3">
+              <%= form.text_area :bio, class: "form-control", rows: 5, placeholder: "Tell us about yourself..." %>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between">
+            <%= form.submit "Update Profile", class: "btn btn-primary" %>
+            <%= link_to "Back to Profile", profile_path(@profile), class: "btn btn-outline-secondary" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

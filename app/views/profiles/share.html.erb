@@ -1,0 +1,36 @@
+<div class="container mt-4">
+  <div class="card border-0 shadow">
+    
+    <div class="card-body p-0">
+      <!-- Background picture area -->
+      <div class="position-relative">
+        <% if @profile.background_picture.attached? %>
+          <%= image_tag @profile.background_picture, class: "w-100", style: "height: 200px; object-fit: cover;" %>
+        <% else %>
+          <div class="bg-light w-100" style="height: 200px;"></div>
+        <% end %>
+        
+        <!-- Profile picture centered on the background -->
+        <div class="position-absolute" style="top: 150px; left: 50%; transform: translateX(-50%);">
+          <% if @profile.profile_picture.attached? %>
+            <%= image_tag @profile.profile_picture, class: "rounded-circle border border-4 border-white", style: "width: 100px; height: 100px; object-fit: cover;" %>
+          <% else %>
+            <div class="rounded-circle bg-secondary d-flex justify-content-center align-items-center border border-4 border-white" style="width: 100px; height: 100px;">
+              <span class="display-6 text-white"><%= @profile.user.email.first.upcase %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      
+      <!-- Bio section -->
+      <div class="text-center mt-5 px-4 pb-4">
+        <h2 class="h4 mb-3"><%= @profile.user.email.split('@').first %></h2>
+        <% if @profile.bio.present? %>
+          <p class="text-muted"><%= @profile.bio %></p>
+        <% else %>
+          <p class="text-muted">No bio available.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
