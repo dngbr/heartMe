@@ -1,3 +1,7 @@
+<% content_for :head do %>
+  <meta name="turbo-visit-control" content="reload">
+<% end %>
+
 <div class="row">
   <div class="col-md-12">
     <div class="card">
@@ -21,11 +25,13 @@
             <h4>Background Picture</h4>
             <% if @profile.background_picture.attached? %>
               <div class="mb-3">
-                <%= image_tag @profile.background_picture, class: "img-fluid", style: "max-height: 200px; border-radius: 8px;" %>
+                <%= image_tag @profile.background_picture, class: "img-fluid background-picture-display", style: "max-height: 200px; border-radius: 8px;" %>
               </div>
             <% end %>
             <div class="mb-3">
-              <%= form.file_field :background_picture, class: "form-control", accept: "image/*" %>
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#backgroundPictureModal">
+                <i class="bi bi-image"></i> <% if @profile.background_picture.attached? %> Change<% else %>Upload<% end %> Background Picture
+              </button>
             </div>
           </div>
           
@@ -33,11 +39,13 @@
             <h4>Profile Picture</h4>
             <% if @profile.profile_picture.attached? %>
               <div class="mb-3">
-                <%= image_tag @profile.profile_picture, class: "img-fluid rounded-circle", style: "width: 150px; height: 150px; object-fit: cover;" %>
+                <%= image_tag @profile.profile_picture, class: "img-fluid rounded-circle profile-picture-display", style: "width: 150px; height: 150px; object-fit: cover;" %>
               </div>
             <% end %>
             <div class="mb-3">
-              <%= form.file_field :profile_picture, class: "form-control", accept: "image/*" %>
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#profilePictureModal">
+                <i class="bi bi-camera"></i> <% if @profile.profile_picture.attached? %> Change<% else %>Upload<% end %> Profile Picture
+              </button>
             </div>
           </div>
           
@@ -64,3 +72,361 @@
     </div>
   </div>
 </div>
+
+<!-- Profile Picture Upload and Crop Modal -->
+<div class="modal fade" id="profilePictureModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Upload & Crop Profile Picture</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Upload and crop in one step -->
+        <div id="upload-step">
+          <div class="mb-3">
+            <label for="profile-upload" class="form-label">Select an image to crop and upload</label>
+            <input type="file" id="profile-upload" class="form-control" accept="image/*">
+          </div>
+        </div>
+        
+        <!-- Step 2: Crop (initially hidden) -->
+        <div id="crop-step" style="display: none;">
+          <div class="img-container mb-3" style="max-height: 400px;">
+            <img id="crop-image" src="" alt="Upload an image to crop" style="max-width: 100%;">
+          </div>
+          <p class="text-muted">Drag the crop box to position it, or resize it by dragging the corners.</p>
+          <div class="d-grid">
+            <button type="button" id="crop-btn" class="btn btn-success">Save Profile Picture</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  let cropper;
+  const uploadStep = document.getElementById('upload-step');
+  const cropStep = document.getElementById('crop-step');
+  const uploadInput = document.getElementById('profile-upload');
+  const cropBtn = document.getElementById('crop-btn');
+  const cropImage = document.getElementById('crop-image');
+  const modal = document.getElementById('profilePictureModal');
+  
+  // Reset modal when closed
+  modal.addEventListener('hidden.bs.modal', function() {
+    if (cropper) {
+      cropper.destroy();
+      cropper = null;
+    }
+    uploadStep.style.display = 'block';
+    cropStep.style.display = 'none';
+    uploadInput.value = '';
+  });
+  
+  // When user selects a file, immediately show the cropper
+  uploadInput.addEventListener('change', function() {
+    if (uploadInput.files && uploadInput.files[0]) {
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        // Show the image in the cropper
+        cropImage.src = e.target.result;
+        
+        // Hide upload, show crop
+        uploadStep.style.display = 'none';
+        cropStep.style.display = 'block';
+        
+        // Initialize cropper
+        if (cropper) {
+          cropper.destroy();
+        }
+        
+        cropper = new Cropper(cropImage, {
+          aspectRatio: 1, // Square
+          viewMode: 1,
+          dragMode: 'move',
+          autoCropArea: 0.8,
+          restore: false,
+          guides: true,
+          center: true,
+          highlight: false,
+          cropBoxMovable: true,
+          cropBoxResizable: true,
+          toggleDragModeOnDblclick: false
+        });
+      };
+      
+      reader.readAsDataURL(uploadInput.files[0]);
+    }
+  });
+  
+  // When user clicks "Save Profile Picture"
+  cropBtn.addEventListener('click', function() {
+    if (!cropper) return;
+    
+    // Show loading state
+    cropBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+    cropBtn.disabled = true;
+    
+    // Get cropped canvas
+    const canvas = cropper.getCroppedCanvas({
+      width: 400,
+      height: 400
+    });
+    
+    // Convert to blob
+    canvas.toBlob(function(blob) {
+      // Create FormData
+      const formData = new FormData();
+      formData.append('profile[profile_picture]', blob, 'profile_picture.png');
+      
+      // Get CSRF token
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+      
+      // Send to server
+      fetch('<%= update_profile_picture_profiles_path %>', {
+        method: 'PATCH',
+        headers: {
+          'X-CSRF-Token': csrfToken
+        },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Reset button state
+          cropBtn.innerHTML = 'Save Profile Picture';
+          cropBtn.disabled = false;
+          
+          // Close modal
+          const modalInstance = bootstrap.Modal.getInstance(modal);
+          modalInstance.hide();
+          
+          // Update profile picture on page
+          const profilePicture = document.querySelector('.profile-picture-display');
+          if (profilePicture) {
+            profilePicture.src = data.image_url;
+          }
+          
+          // Show success message
+          const alertContainer = document.createElement('div');
+          alertContainer.className = 'alert alert-success alert-dismissible fade show';
+          alertContainer.innerHTML = `
+            Profile picture updated successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          `;
+          document.querySelector('.card-body').prepend(alertContainer);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        cropBtn.innerHTML = 'Save Profile Picture';
+        cropBtn.disabled = false;
+      });
+    }, 'image/png', 0.9); // 90% quality
+  });
+});
+</script>
+
+<!-- Background Picture Upload and Crop Modal -->
+<div class="modal fade" id="backgroundPictureModal" tabindex="-1" aria-labelledby="backgroundPictureModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="backgroundPictureModalLabel">Upload & Crop Background Picture</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Upload step -->
+        <div id="background-upload-step">
+          <div class="mb-3">
+            <label for="background-upload-input" class="form-label">Select an image to upload</label>
+            <input type="file" id="background-upload-input" class="form-control" accept="image/*">
+          </div>
+        </div>
+        
+        <!-- Crop step (initially hidden) -->
+        <div id="background-crop-step" style="display: none;">
+          <div class="img-container mb-3" style="max-height: 400px;">
+            <img id="background-crop-image" src="" alt="Upload an image to crop" style="max-width: 100%;">
+          </div>
+          <p class="text-muted">Drag the crop box to position it, or resize it by dragging the corners. Background images work best with a 3:1 ratio (1200x400 pixels).</p>
+          <div class="d-grid">
+            <button type="button" id="background-crop-btn" class="btn btn-success">Save Background Picture</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Background picture cropping functionality
+document.addEventListener('DOMContentLoaded', function() {
+  let backgroundCropper;
+  const backgroundUploadStep = document.getElementById('background-upload-step');
+  const backgroundCropStep = document.getElementById('background-crop-step');
+  const backgroundUploadInput = document.getElementById('background-upload-input');
+  const backgroundCropBtn = document.getElementById('background-crop-btn');
+  const backgroundCropImage = document.getElementById('background-crop-image');
+  const backgroundModal = document.getElementById('backgroundPictureModal');
+  
+  if (!backgroundUploadInput || !backgroundCropBtn || !backgroundCropImage) {
+    console.error('Background cropper elements not found');
+    return;
+  }
+  
+  // Reset modal when closed
+  backgroundModal.addEventListener('hidden.bs.modal', function() {
+    if (backgroundCropper) {
+      backgroundCropper.destroy();
+      backgroundCropper = null;
+    }
+    backgroundUploadStep.style.display = 'block';
+    backgroundCropStep.style.display = 'none';
+    backgroundUploadInput.value = '';
+  });
+  
+  // When user selects a file, immediately show the cropper
+  backgroundUploadInput.addEventListener('change', function() {
+    if (backgroundUploadInput.files && backgroundUploadInput.files[0]) {
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        // Show the image in the cropper
+        backgroundCropImage.src = e.target.result;
+        
+        // Hide upload, show crop
+        backgroundUploadStep.style.display = 'none';
+        backgroundCropStep.style.display = 'block';
+        
+        // Initialize cropper
+        if (backgroundCropper) {
+          backgroundCropper.destroy();
+        }
+        
+        backgroundCropper = new Cropper(backgroundCropImage, {
+          aspectRatio: 3 / 1, // 3:1 ratio for background
+          viewMode: 1,
+          dragMode: 'move',
+          autoCropArea: 0.8,
+          restore: false,
+          guides: true,
+          center: true,
+          highlight: false,
+          cropBoxMovable: true,
+          cropBoxResizable: true,
+          toggleDragModeOnDblclick: false
+        });
+      };
+      
+      reader.readAsDataURL(backgroundUploadInput.files[0]);
+    }
+  });
+  
+  // When user clicks "Save Background Picture"
+  backgroundCropBtn.addEventListener('click', function() {
+    if (!backgroundCropper) return;
+    
+    // Show loading state
+    backgroundCropBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+    backgroundCropBtn.disabled = true;
+    
+    // Get cropped canvas
+    const canvas = backgroundCropper.getCroppedCanvas({
+      width: 1200,
+      height: 400
+    });
+    
+    // Convert to blob
+    canvas.toBlob(function(blob) {
+      // Create FormData
+      const formData = new FormData();
+      formData.append('profile[background_picture]', blob, 'background_picture.png');
+      
+      // Get CSRF token
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+      
+      // Send to server
+      fetch('<%= update_background_picture_profiles_path %>', {
+        method: 'PATCH',
+        headers: {
+          'X-CSRF-Token': csrfToken
+        },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Reset button state
+          backgroundCropBtn.innerHTML = 'Save Background Picture';
+          backgroundCropBtn.disabled = false;
+          
+          // Close modal
+          const modalInstance = bootstrap.Modal.getInstance(backgroundModal);
+          modalInstance.hide();
+          
+          // Update background picture on page
+          const backgroundPicture = document.querySelector('.background-picture-display');
+          if (backgroundPicture) {
+            backgroundPicture.src = data.image_url;
+          } else {
+            // If the image doesn't exist yet, create it
+            const container = document.querySelector('.mb-3:has(button[data-bs-target="#backgroundPictureModal"])').previousElementSibling;
+            if (!container) {
+              location.reload(); // Fallback to reload if we can't find the container
+              return;
+            }
+            
+            const newImg = document.createElement('img');
+            newImg.src = data.image_url;
+            newImg.className = 'img-fluid background-picture-display';
+            newImg.style = 'max-height: 200px; border-radius: 8px;';
+            container.appendChild(newImg);
+          }
+          
+          // Show success message
+          const alertContainer = document.createElement('div');
+          alertContainer.className = 'alert alert-success alert-dismissible fade show';
+          alertContainer.innerHTML = `
+            Background picture updated successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          `;
+          document.querySelector('.card-body').prepend(alertContainer);
+        } else {
+          console.error('Error:', data.error);
+          backgroundCropBtn.innerHTML = 'Save Background Picture';
+          backgroundCropBtn.disabled = false;
+          
+          // Show error message
+          const alertContainer = document.createElement('div');
+          alertContainer.className = 'alert alert-danger alert-dismissible fade show';
+          alertContainer.innerHTML = `
+            Error updating background picture: ${data.error || 'Unknown error'}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          `;
+          document.querySelector('.card-body').prepend(alertContainer);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        backgroundCropBtn.innerHTML = 'Save Background Picture';
+        backgroundCropBtn.disabled = false;
+        
+        // Show error message
+        const alertContainer = document.createElement('div');
+        alertContainer.className = 'alert alert-danger alert-dismissible fade show';
+        alertContainer.innerHTML = `
+          Error updating background picture. Please try again.
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.querySelector('.card-body').prepend(alertContainer);
+      });
+    }, 'image/png', 0.9); // 90% quality
+  });
+});
+</script>

@@ -1,0 +1,53 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h2>People who hearted you</h2>
+      <%= link_to "Back to Profile", profile_path(@profile), class: "btn btn-outline-primary" %>
+    </div>
+    <div class="card-body">
+      <% if @fans.any? %>
+        <div class="row">
+          <% @fans.each do |fan| %>
+            <div class="col-md-3 col-sm-4 col-6 mb-4 text-center">
+              <div class="card h-100">
+                <div class="card-body">
+                  <% if fan.profile.profile_picture.attached? %>
+                    <%= link_to profile_path(fan.profile) do %>
+                      <%= image_tag fan.profile.profile_picture, class: "rounded-circle mb-2", style: "width: 80px; height: 80px; object-fit: cover;" %>
+                    <% end %>
+                  <% else %>
+                    <%= link_to profile_path(fan.profile) do %>
+                      <div class="rounded-circle bg-secondary d-inline-flex justify-content-center align-items-center mb-2" style="width: 80px; height: 80px;">
+                        <span class="text-white h4"><%= fan.email.first.upcase %></span>
+                      </div>
+                    <% end %>
+                  <% end %>
+                  <h5 class="card-title">
+                    <%= link_to fan.profile.name.presence || fan.email.split('@').first, profile_path(fan.profile), class: "text-decoration-none" %>
+                  </h5>
+                  <p class="card-text small text-muted">
+                    <% heart = fan.given_hearts.find_by(receiver: @profile.user) %>
+                    <% if heart %>
+                      Hearted on <%= heart.created_at.strftime("%b %d, %Y") %>
+                    <% else %>
+                      Hearted you
+                    <% end %>
+                  </p>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        
+        <div class="d-flex justify-content-center mt-3">
+          <%# Add pagination here if using Kaminari or will_paginate %>
+          <%= paginate @fans if defined?(paginate) %>
+        </div>
+      <% else %>
+        <div class="alert alert-info">
+          <p class="mb-0">No one has hearted this profile yet.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

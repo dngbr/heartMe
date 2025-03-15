@@ -1,0 +1,53 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h2>People you hearted</h2>
+      <%= link_to "Back to Profile", profile_path(@profile), class: "btn btn-outline-primary" %>
+    </div>
+    <div class="card-body">
+      <% if @hearted_users.any? %>
+        <div class="row">
+          <% @hearted_users.each do |hearted_user| %>
+            <div class="col-md-3 col-sm-4 col-6 mb-4 text-center">
+              <div class="card h-100">
+                <div class="card-body">
+                  <% if hearted_user.profile.profile_picture.attached? %>
+                    <%= link_to profile_path(hearted_user.profile) do %>
+                      <%= image_tag hearted_user.profile.profile_picture, class: "rounded-circle mb-2", style: "width: 80px; height: 80px; object-fit: cover;" %>
+                    <% end %>
+                  <% else %>
+                    <%= link_to profile_path(hearted_user.profile) do %>
+                      <div class="rounded-circle bg-secondary d-inline-flex justify-content-center align-items-center mb-2" style="width: 80px; height: 80px;">
+                        <span class="text-white h4"><%= hearted_user.email.first.upcase %></span>
+                      </div>
+                    <% end %>
+                  <% end %>
+                  <h5 class="card-title">
+                    <%= link_to hearted_user.profile.name.presence || hearted_user.email.split('@').first, profile_path(hearted_user.profile), class: "text-decoration-none" %>
+                  </h5>
+                  <p class="card-text small text-muted">
+                    Hearted on <%= @profile.user.given_hearts.find_by(receiver: hearted_user).created_at.strftime("%b %d, %Y") %>
+                  </p>
+                  <% if current_user == @profile.user %>
+                    <%= button_to unheart_user_path(hearted_user), method: :delete, class: "btn btn-sm btn-outline-danger", form: { data: { turbo: false } } do %>
+                      <i class="fas fa-heart-broken"></i> Unheart
+                    <% end %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        
+        <div class="d-flex justify-content-center mt-3">
+          <%# Add pagination here if using Kaminari or will_paginate %>
+          <%= paginate @hearted_users if defined?(paginate) %>
+        </div>
+      <% else %>
+        <div class="alert alert-info">
+          <p class="mb-0">This user hasn't hearted anyone yet.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

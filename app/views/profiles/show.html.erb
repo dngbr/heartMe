@@ -24,6 +24,37 @@
         <%= @profile.user.email.split('@').first %>
       <% end %>
     </h2>
+    
+    <!-- Heart stats -->
+    <div class="d-flex justify-content-center mt-2 mb-3">
+      <% if current_user && current_user.id == @profile.user_id %>
+        <!-- For the profile owner, show both received and given with links -->
+        <div class="me-4">
+          <span class="d-block text-center"><i class="fas fa-heart text-danger"></i></span>
+          <span class="d-block text-center">
+            <%= link_to fans_profile_path(@profile), class: "text-decoration-none" do %>
+              <%= @profile.user.hearts_received_count %> ❤︎ received
+            <% end %>
+          </span>
+        </div>
+        <div>
+          <span class="d-block text-center"><i class="fas fa-heart-circle-plus text-primary"></i></span>
+          <span class="d-block text-center">
+            <%= link_to hearted_profile_path(@profile), class: "text-decoration-none" do %>
+              <%= @profile.user.hearts_given_count %> ❤︎ given
+            <% end %>
+          </span>
+        </div>
+      <% else %>
+        <!-- For other users viewing this profile, show only hearts received without link -->
+        <div>
+          <span class="d-block text-center"><i class="fas fa-heart text-danger"></i></span>
+          <span class="d-block text-center">
+            <%= @profile.user.hearts_received_count %> ❤︎ received
+          </span>
+        </div>
+      <% end %>
+    </div>
     <% if current_user == @profile.user %>
       <div class="mt-2">
         <%= link_to "Edit Profile", edit_profile_path(@profile), class: "btn btn-outline-primary" %>
@@ -44,33 +75,24 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Your profile can only be viewed by scanning the QR code. The URL cannot be accessed directly.
+              </div>
               <!-- Tab navigation -->
               <ul class="nav nav-tabs mb-3" id="shareTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                  <button class="nav-link active" id="link-tab" data-bs-toggle="tab" data-bs-target="#link-tab-pane" type="button" role="tab" aria-controls="link-tab-pane" aria-selected="true">Share Link</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link" id="qr-tab" data-bs-toggle="tab" data-bs-target="#qr-tab-pane" type="button" role="tab" aria-controls="qr-tab-pane" aria-selected="false">QR Code</button>
+                  <button class="nav-link active" id="qr-tab" data-bs-toggle="tab" data-bs-target="#qr-tab-pane" type="button" role="tab" aria-controls="qr-tab-pane" aria-selected="true">QR Code</button>
                 </li>
               </ul>
               
               <!-- Tab content -->
-              <div class="tab-content" id="shareTabContent">
-                <!-- Link sharing tab -->
-                <div class="tab-pane fade show active" id="link-tab-pane" role="tabpanel" aria-labelledby="link-tab" tabindex="0">
-                  <p>Share this link with others to let them view your profile:</p>
-                  <div class="input-group mb-3">
-                    <input type="text" class="form-control" id="shareUrl" value="<%= @profile.shareable_url %>" readonly>
-                    <button class="btn btn-outline-primary" type="button" onclick="copyShareUrl()">Copy</button>
-                  </div>
-                </div>
-                
-                <!-- QR code tab -->
-                <div class="tab-pane fade" id="qr-tab-pane" role="tabpanel" aria-labelledby="qr-tab" tabindex="0">
+              <div class="tab-content" id="shareTabContent">                
+                <!-- QR code tab - now the primary sharing method -->
+                <div class="tab-pane fade show active" id="qr-tab-pane" role="tabpanel" aria-labelledby="qr-tab" tabindex="0">
                   <p>Scan this QR code to view the profile:</p>
                   <div class="text-center mb-3">
                     <div id="qrcode" style="display: inline-block; padding: 15px; background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                      <%= @profile.qr_code.html_safe %>
+                      <%= @profile.secure_qr_code.html_safe %>
                     </div>
                   </div>
                   <div class="d-grid gap-2">
@@ -89,7 +111,7 @@
   </div>
   
   <div class="col-md-8">
-    <div class="card">
+    <div class="card mb-4">
       <div class="card-header">
         <h3>Bio</h3>
       </div>
@@ -101,5 +123,69 @@
         <% end %>
       </div>
     </div>
+    
+    <!-- Hearts received section - only visible to profile owner -->
+    <% if @fans.any? && current_user && current_user.id == @profile.user_id %>
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h3>People who hearted me</h3>
+          <% if @profile.user.hearts_received_count > 10 %>
+            <%= link_to "View all", fans_profile_path(@profile), class: "btn btn-sm btn-outline-primary" %>
+          <% end %>
+        </div>
+        <div class="card-body">
+          <div class="d-flex flex-wrap">
+            <% @fans.each do |fan| %>
+              <div class="text-center me-3 mb-3" style="width: 80px;">
+                <% if fan.profile.profile_picture.attached? %>
+                  <%= link_to profile_path(fan.profile) do %>
+                    <%= image_tag fan.profile.profile_picture, class: "rounded-circle", style: "width: 60px; height: 60px; object-fit: cover;" %>
+                  <% end %>
+                <% else %>
+                  <%= link_to profile_path(fan.profile) do %>
+                    <div class="rounded-circle bg-secondary d-inline-flex justify-content-center align-items-center" style="width: 60px; height: 60px;">
+                      <span class="text-white"><%= fan.email.first.upcase %></span>
+                    </div>
+                  <% end %>
+                <% end %>
+                <small class="d-block text-truncate mt-1"><%= fan.profile.name.presence || fan.email.split('@').first %></small>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+    
+    <!-- Hearts given section -->
+    <% if @hearted_users.any? %>
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h3>People I hearted</h3>
+          <% if @profile.user.hearts_given_count > 10 %>
+            <%= link_to "View all", hearted_profile_path(@profile), class: "btn btn-sm btn-outline-primary" %>
+          <% end %>
+        </div>
+        <div class="card-body">
+          <div class="d-flex flex-wrap">
+            <% @hearted_users.each do |hearted_user| %>
+              <div class="text-center me-3 mb-3" style="width: 80px;">
+                <% if hearted_user.profile.profile_picture.attached? %>
+                  <%= link_to profile_path(hearted_user.profile) do %>
+                    <%= image_tag hearted_user.profile.profile_picture, class: "rounded-circle", style: "width: 60px; height: 60px; object-fit: cover;" %>
+                  <% end %>
+                <% else %>
+                  <%= link_to profile_path(hearted_user.profile) do %>
+                    <div class="rounded-circle bg-secondary d-inline-flex justify-content-center align-items-center" style="width: 60px; height: 60px;">
+                      <span class="text-white"><%= hearted_user.email.first.upcase %></span>
+                    </div>
+                  <% end %>
+                <% end %>
+                <small class="d-block text-truncate mt-1"><%= hearted_user.profile.name.presence || hearted_user.email.split('@').first %></small>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
   </div>
 </div>

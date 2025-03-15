@@ -1,0 +1,23 @@
+// SASS variable overrides must be declared before loading up Active Admin's styles.
+//
+// To view the variables that Active Admin provides, take a look at
+// `app/assets/stylesheets/active_admin/mixins/_variables.scss` in the
+// Active Admin source.
+//
+// For example, to change the sidebar width:
+// $sidebar-width: 242px;
+
+// Active Admin's got SASS!
+// Define a custom color palette to match heartMe's dark red theme
+$primary-color: #8B0000;    // Dark red to match heartMe's theme
+$secondary-color: #A52A2A;  // Brown-red as a secondary color
+@import "active_admin/mixins";
+@import "active_admin/base";
+
+// Overriding any non-variable Sass must be done after the fact.
+// For example, to change the default status-tag color:
+//
+//   .status_tag { background: #6090DB; }
+
+// Custom styling for alternating rows in tables
+table.index_table tr.even td { background-color: #FFEEEE; } // Light red for even rows

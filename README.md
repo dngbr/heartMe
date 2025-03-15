@@ -1,8 +1,8 @@
-# HeartMe
+# heartMe
 
 ## Description
 
-HeartMe is a profile sharing application built with Ruby on Rails that allows users to create and share their profiles with others through unique URLs and QR codes. The application features user authentication with Devise, profile management with customizable profile pictures and background images, and an innovative sharing system using UUIDs.
+heartMe is a profile sharing application built with Ruby on Rails that allows users to create and share their profiles with others through unique URLs and QR codes. The application features user authentication with Devise, profile management with customizable profile pictures and background images, and an innovative sharing system using UUIDs.
 
 Key features include:
 - User authentication with Devise

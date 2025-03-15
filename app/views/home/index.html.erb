@@ -1,44 +1,45 @@
 <div class="bg-light p-5 rounded-lg mb-5 text-center">
-  <h1 class="display-4">Welcome to HeartMe</h1>
-  <p class="lead">Connect with friends and share your moments</p>
-  
-  <% if !user_signed_in? %>
-    <div class="mt-4">
-      <%= link_to "Sign Up", new_user_registration_path, class: "btn btn-primary btn-lg me-2" %>
-      <%= link_to "Sign In", new_user_session_path, class: "btn btn-outline-primary btn-lg" %>
-    </div>
-  <% else %>
-    <div class="mt-4">
-      <%= link_to "View Your Profile", profile_path(current_user.profile), class: "btn btn-primary btn-lg" %>
-    </div>
-  <% end %>
+  <h1 class="display-4">Welcome to heartMe! ❤︎</h1>
+  <p class="lead">Connect by fashion</p>
 </div>
 
 <div class="row mt-5 g-4">
   <div class="col-md-4">
     <div class="card h-100">
-      <div class="card-body">
-        <h2 class="card-title h4">Create Your Profile</h2>
-        <p class="card-text">Customize your profile with a profile picture and background image that represents you.</p>
+      <div class="card-body text-center">
+        <i class="bi bi-person-badge mb-3" style="font-size: 2rem;"></i>
+        <h2 class="card-title h4">Fashion Identity</h2>
+        <p class="card-text">Express your unique style with a customized profile that showcases your fashion sense.</p>
       </div>
     </div>
   </div>
   
   <div class="col-md-4">
     <div class="card h-100">
-      <div class="card-body">
-        <h2 class="card-title h4">Connect with Others</h2>
-        <p class="card-text">Find and connect with friends, family, and like-minded individuals.</p>
+      <div class="card-body text-center">
+        <i class="bi bi-heart mb-3" style="font-size: 2rem;"></i>
+        <h2 class="card-title h4">Connect Through Style</h2>
+        <p class="card-text">Discover and connect with fashion enthusiasts who share your taste and aesthetic.</p>
       </div>
     </div>
   </div>
   
   <div class="col-md-4">
     <div class="card h-100">
-      <div class="card-body">
-        <h2 class="card-title h4">Share Your Story</h2>
-        <p class="card-text">Express yourself through posts, photos, and updates about your life.</p>
+      <div class="card-body text-center">
+        <i class="bi bi-qr-code mb-3" style="font-size: 2rem;"></i>
+        <h2 class="card-title h4">Scan & Connect</h2>
+        <p class="card-text">Use QR codes on clothing items to instantly connect with people around the world.</p>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Shop Section -->
+<div class="bg-dark text-white p-5 rounded-lg my-5 text-center">
+  <h2 class="display-5">Discover Our Fashion Collection</h2>
+  <p class="lead">Explore our latest styles featuring integrated heartMe QR codes</p>
+  <div class="mt-4">
+    <a href="#" class="btn btn-light btn-lg">Shop Now</a>
   </div>
 </div>

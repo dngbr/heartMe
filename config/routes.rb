@@ -1,11 +1,29 @@
 Rails.application.routes.draw do
+  devise_for :admin_users, ActiveAdmin::Devise.config
+  ActiveAdmin.routes(self)
+  
   # Authentication routes
   devise_for :users
   
+  # Heart functionality
+  resources :hearts, only: [:create, :destroy]
+  post 'heart/:id', to: 'hearts#create', as: :heart_user
+  delete 'unheart/:id', to: 'hearts#destroy', as: :unheart_user
+  
   # Profile routes
-  resources :profiles, only: [:show, :edit, :update]
-  # Share profile route using query parameter format: /share_profile?id=uuid
-  get 'share_profile', to: 'profiles#share', as: :share_profile
+  resources :profiles, only: [:show, :edit, :update] do
+    member do
+      get :fans     # People who hearted me
+      get :hearted  # People I hearted
+    end
+    collection do
+      patch :update_profile_picture  # For cropped profile picture uploads
+      patch :update_background_picture  # For cropped background picture uploads
+    end
+  end
+  
+  # Secure profile viewing with encrypted share_id
+  get 'p/:code', to: 'profiles#view_shared_profile', as: :shared_profile
   
   # Home page
   get 'home/index'

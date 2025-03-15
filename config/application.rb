@@ -15,6 +15,12 @@ module HeartMe
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
+    
+    # Configure the application to use Sprockets for ActiveAdmin
+    config.assets.enabled = true
+    config.assets.paths << Rails.root.join("app", "assets", "stylesheets")
+    config.assets.paths << Rails.root.join("app", "assets", "javascripts")
+    config.assets.precompile += %w[active_admin.css active_admin.js]
 
     # Configuration for the application, engines, and railties goes here.
     #

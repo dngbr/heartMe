@@ -1,0 +1,138 @@
+/* Main application styles */
+
+/* Color scheme */
+:root {
+  --primary-color: #4c0101;
+  --primary-hover: #804848;
+  --secondary-color: #343a40;
+  --light-color: #f8f9fa;
+  --dark-color: #212529;
+}
+
+/* Base styles */
+body {
+  background-color: var(--light-color);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navbar styles */
+.navbar-dark {
+  background-color: var(--primary-color) !important;
+}
+
+.navbar-brand {
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.nav-link {
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.btn-outline-primary {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+/* Heart button specific styles */
+.btn-danger, .btn-outline-danger {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+.btn-danger:hover, .btn-outline-danger:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+  color: white;
+}
+
+.btn-outline-danger {
+  background-color: transparent;
+  color: var(--primary-color);
+}
+
+.btn-outline-danger:hover {
+  background-color: var(--primary-hover);
+  color: white;
+}
+
+/* Card styles */
+.card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+/* Profile styles */
+.profile-header {
+  position: relative;
+  margin-bottom: 4rem;
+}
+
+.profile-picture {
+  position: absolute;
+  bottom: -3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 3px solid white;
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+}
+
+/* Heart button styles */
+.heart-btn {
+  transition: transform 0.2s ease;
+}
+
+.heart-btn:hover {
+  transform: scale(1.1);
+}
+
+/* QR code container */
+.qr-container {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+/* Fans and hearted users display */
+.user-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.user-card {
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .profile-picture {
+    width: 120px;
+    height: 120px;
+  }
+}
