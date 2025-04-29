@@ -47,7 +47,7 @@ gem "thruster", require: false
 # gem "image_processing", "~> 1.2"
 
 # QR code generation
-gem "rqrcode", "~> 2.2"
+gem "rqrcode", "~> 3.1"
 
 # Load environment variables from .env file
 gem "dotenv-rails", groups: [:development, :test]
